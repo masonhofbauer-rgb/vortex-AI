@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vortex AI</title>
+<style>
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  padding: 20px;
+  background: #0b1020;
+  color: #edf4ff;
+  font-family: Arial, sans-serif;
+}
+.app { max-width: 750px; margin: auto; }
+header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 20px 0 60px;
+}
+.logo { font-size: 42px; color: #67e8f9; }
+h1, h2, p { margin-top: 0; }
+header p, footer { color: #a7b6d0; }
+main { text-align: center; }
+h2 { line-height: 1.4; }
+form { display: flex; gap: 8px; margin: 25px 0; }
+input {
+  min-width: 0;
+  flex: 1;
+  padding: 15px;
+  border-radius: 12px;
+  border: 1px solid #354867;
+  background: #18233a;
+  color: white;
+  font-size: 16px;
+}
+button {
+  padding: 12px 15px;
+  border: 0;
+  border-radius: 10px;
+  background: #67e8f9;
+  color: #062033;
+  font-weight: bold;
+  cursor: pointer;
+  margin: 3px;
+}
+.examples { margin-bottom: 25px; }
+.examples button {
+  background: #18233a;
+  color: white;
+  border: 1px solid #354867;
+}
+#results {
+  text-align: left;
+  padding: 18px;
+  border: 1px solid #2b3956;
+  border-radius: 15px;
+  background: #121a2d;
+  line-height: 1.6;
+}
+a { color: #67e8f9; }
+footer {
+  text-align: center;
+  margin-top: 35px;
+  font-size: 13px;
+}
+@media(max-width:450px) {
+  form { flex-wrap: wrap; }
+  input { width: 100%; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <div class="logo">✦</div>
+  <div>
+    <h1>Vortex AI</h1>
+    <p>Your Vortex knowledge assistant</p>
+  </div>
+</header>
+<main>
+  <h2>What do you want to know about Vortex?</h2>
+  <form id="searchForm">
+    <input id="question" placeholder="Ask about Vortex..." autocomplete="off">
+    <button type="submit">Search</button>
+  </form>
+  <div class="examples">
+    <button type="button" data-q="What is Vortex?">What is Vortex?</button>
+    <button type="button" data-q="What is Vortex Studio?">Vortex Studio</button>
+    <button type="button" data-q="What are Volts?">Volts</button>
+  </div>
+  <section id="results">
+    <p>Welcome! Ask a question to get started.</p>
+  </section>
+</main>
+<footer>
+  Independent fan-made project ·
+  <a href="https://playvortex.wiki/Main_Page" target="_blank">Vortex Wiki</a>
+</footer>
+</div>
+<script>
+const facts = [
+  {
+    name: "What is Vortex?",
+    tags: ["vortex", "game", "platform", "creation"],
+    answer: "Vortex is the platform this fan-made assistant is about. Visit the Vortex Wiki for information and details."
+  },
+  {
+    name: "What is Vortex Studio?",
+    tags: ["studio", "build", "building", "create", "scripting", "code"],
+    answer: "Vortex Studio is associated with creating things in Vortex. Check the wiki for tutorials and current features."
+  },
+  {
+    name: "What are Volts?",
+    tags: ["volts", "currency", "money"],
+    answer: "Looking for information about Volts? Check the Vortex Wiki for accurate details."
+  }
+];
+
+const input = document.getElementById("question");
+const results = document.getElementById("results");
+
+function search(query) {
+  const words = query.toLowerCase()
+    .replace(/[^\w\s]/g, "")
+    .split(/\s+/)
+    .filter(word => word.length > 1);
+
+  const matches = facts.map(fact => {
+    let score = 0;
+    for (const word of words) {
+      if (fact.name.toLowerCase().includes(word)) score += 3;
+      if (fact.tags.some(tag => tag.includes(word) || word.includes(tag))) score += 2;
+    }
+    return { ...fact, score };
+  }).filter(fact => fact.score > 0)
+    .sort((a, b) => b.score - a.score);
+
+  if (!query.trim() || !matches.length) {
+    results.innerHTML = "I don't have an answer for that yet. Try another question or visit the <a href='https://playvortex.wiki/Main_Page' target='_blank'>Vortex Wiki</a>.";
+    return;
+  }
+
+  results.innerHTML = matches.map(fact =>
+    `<article><h3>${fact.name}</h3><p>${fact.answer}</p>
+    <a href="https://playvortex.wiki/Main_Page" target="_blank">Read the Vortex Wiki</a></article>`
+  ).join("<hr>");
+}
+
+document.getElementById("searchForm").addEventListener("submit", event => {
+  event.preventDefault();
+  search(input.value);
+});
+
+document.querySelectorAll("[data-q]").forEach(button => {
+  button.addEventListener("click", () => {
+    input.value = button.dataset.q;
+    search(input.value);
+  });
+});
+</script>
+</body>
+</html>
